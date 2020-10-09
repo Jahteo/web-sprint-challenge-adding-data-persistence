@@ -24,8 +24,15 @@ function getAllResources() {
   return db('resources');
 };
 
+// select t.*, pt.project_id, p.project_name, p.description as project_description
+// from tasks as t
+// left JOIN project_tasks as pt on pt.task_id = t.id
+// left JOIN projects as p on p.id = pt.project_id
 function getAllTasks() {
-  return db('tasks');
+  return db('tasks as t')
+    .leftJoin('project_tasks as pt', 'pt.task_id', '=', 't.id')
+    .leftJoin('projects as p', 'p.id', '=', 'pt.project_id')
+    .select('t.*', 'pt.project_id', 'p.project_name', 'p.description as project_description');
 };
 
 function getByProjectId(id) {
@@ -35,7 +42,6 @@ function getByProjectId(id) {
 function getByResourceId(id) {
   return db("resources").where({ id }).first();
 }
-
 function getByTaskId(id) {
   return db("tasks").where({ id }).first();
 }
@@ -70,6 +76,7 @@ function addTask({ task_name, description, completed, notes, project_id }) {
 
 function addProjectTask( project_id, task_id ) {
   const project_tasksData = { project_id, task_id }
+  console.log("project_tasksData", project_tasksData)
   return db('project_tasks').insert(project_tasksData, "id")
   // .then(ids => {
   //   const task_id = ids[0];

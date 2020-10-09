@@ -31,13 +31,17 @@ router.post("/:id/resource", (req, res) => {
 
 //post a new task
 router.post("/:id/tasks", (req, res) => {
-  const project_id = req.params.id;
+  const project_id = parseInt(req.params.id);
   Projects.addTask(req.body)
     .then(task => {
       const task_id = task.id
+      console.log("Task_id:", task_id)
       // console.log(req.body)
-      res.status(201).json({ created: task });
       Projects.addProjectTask(project_id, task_id)
+        .then(data => {
+          res.status(201).json({ created: task });
+        })
+        .catch();
     })
     .catch(err => {
       console.log(req.body)
